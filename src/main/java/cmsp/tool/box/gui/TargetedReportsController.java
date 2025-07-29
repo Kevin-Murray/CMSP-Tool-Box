@@ -28,9 +28,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,24 +44,284 @@ import java.util.prefs.Preferences;
  */
 public class TargetedReportsController {
 
-    @FXML private TextField skylineDocumentFile;
-    @FXML private Spinner<Integer> blankThresholdSpinner;
-    @FXML private Spinner<Integer> loqThresholdSpinner;
-    @FXML private Spinner<Integer> accuracyThresholdSpinner;
-    @FXML private TableView<TargetedMoleculeEntry> moleculeTable;
+    static final org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(TargetedReportsController.class);
+    private int accThreshold;
     @FXML private TableView<Map<Integer, String>> accuracyTable;
-    @FXML private TableView<Map<Integer, String>> sampleTable;
-    @FXML private TableView<Map<Integer, String>> precisionTable;
-    @FXML private TableView<TargetedDetailEntry> fileDetailsTable;
-
-    private Preferences prefs;
+    @FXML private Spinner<Integer> accuracyThresholdSpinner;
+    @FXML private Spinner<Integer> blankThresholdSpinner;
     private Path databasePath;
     private Path documentPath;
-    private TargetedReportsTask reportsTask;
+    @FXML private TableView<TargetedDetailEntry> fileDetailsTable;
     private int lodThreshold;
     private int loqThreshold;
-    private int accThreshold;
+    @FXML private Spinner<Integer> loqThresholdSpinner;
+    @FXML private TableView<TargetedMoleculeEntry> moleculeTable;
+    @FXML private TableView<Map<Integer, String>> precisionTable;
+    private Preferences prefs;
+    private TargetedReportsTask reportsTask;
+    @FXML private TableView<Map<Integer, String>> sampleTable;
+    @FXML private TextField skylineDocumentFile;
     private Workbook workbook;
+
+    /**
+     * Get error message stack trace for error message display.
+     *
+     * @param e Exception
+     * @return Error message string
+     */
+    public static String getStackTraceString(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
+    }
+
+    /**
+     * Create excel workbook object for final report.
+     *
+     * @throws IOException
+     */
+    public void createExcelWorkbook() throws IOException {
+
+        workbook = new XSSFWorkbook();
+
+        Sheet sheetSummary = workbook.createSheet("Result Summary");
+        Sheet sheetFit = workbook.createSheet("Calibration Fit");
+        Sheet sheetAccuracy = workbook.createSheet("Experimental Accuracy");
+        Sheet sheetPrecision = workbook.createSheet("Experimental Precision");
+        Sheet sheetDetails = workbook.createSheet("Raw Data Details");
+        Sheet sheetLegend = workbook.createSheet("Color Legend");
+
+        writeXLSXTable(sheetSummary, sampleTable, "Result Summary");
+        writeXLSXTable(sheetFit, moleculeTable, "Calibration Fit");
+        writeXLSXTable(sheetAccuracy, accuracyTable, "Experimental Accuracy");
+        writeXLSXTable(sheetPrecision, precisionTable, "Experimental Precision");
+        writeXLSXTable(sheetDetails, fileDetailsTable, "Raw Data Details");
+
+        writeXLSXTableLegend(sheetLegend);
+    }
+
+    /**
+     * Export report workbook to local file.
+     *
+     * @param actionEvent Mouseclick. Not used.
+     */
+    public void exportButtonClick(ActionEvent actionEvent) {
+
+        Stage stage = new Stage();
+
+        File defaultDirectory = new File(documentPath.getParent().toString());
+        String defaultName = documentPath.getFileName().toString().split("\\.")[0] + "_report.xlsx";
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Report As...");
+        fileChooser.setInitialDirectory(defaultDirectory);
+        fileChooser.setInitialFileName(defaultName);
+
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Excel Workbook (*.xlsx)", "*.xlsx");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File outputFile = fileChooser.showSaveDialog(stage);
+
+        // Write to file
+        try (FileOutputStream out = new FileOutputStream(outputFile)) {
+            workbook.write(out);
+            out.close();
+            workbook.close();
+        } catch (IOException e) {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+            showErrorMessage(getStackTraceString(e));
+        }
+    }
+
+    /**
+     * Submit selected Skyline document for report formatting.
+     * Export necessary reports and format them for visualization.
+     */
+    public void generateResultTables() {
+
+        this.lodThreshold = blankThresholdSpinner.getValue();
+        this.loqThreshold = loqThresholdSpinner.getValue();
+        this.accThreshold = accuracyThresholdSpinner.getValue();
+
+        // Submit user parameters to new task.
+        reportsTask = new TargetedReportsTask(databasePath, documentPath, lodThreshold, loqThreshold, accThreshold);
+
+        // Export results and format output for TableView
+        // Catch unhandled error messages
+        try {
+            reportsTask.run();
+        } catch (Exception e) {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+            showErrorMessage(getStackTraceString(e));
+            return;
+        }
+
+        // Handled error message recorded.
+        if (reportsTask.hasErrorMessage()) {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+            showErrorMessage(reportsTask.getErrorMessages());
+            return;
+        }
+
+        // Check if Skyline exports are valid and contain necessary components.
+        ErrorTypes error = reportsTask.validDocument();
+        if (error != null) {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+            showErrorMessage(error);
+            return;
+        }
+
+        // Generate tables for visualization and export.
+        // Print unhandled error messages
+        try {
+            reportsTask.generateReports();
+        } catch (Exception e) {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+            showErrorMessage(getStackTraceString(e));
+            return;
+        }
+
+        // Sample Outcomes Table
+        sampleTable.getColumns().clear();
+        sampleTable.getItems().clear();
+        sampleTable.refresh();
+        sampleTable.getColumns().addAll(reportsTask.makeSampleTable());
+        sampleTable.getItems().addAll(reportsTask.getSampleTable());
+
+        // Calibration Fit Table
+        moleculeTable.getColumns().clear();
+        moleculeTable.getItems().clear();
+        moleculeTable.refresh();
+        moleculeTable.getColumns().addAll(reportsTask.makeMoleculeTable());
+        moleculeTable.getItems().addAll(reportsTask.getTargetedMoleculeEntry());
+
+        // Experimental Accuracy Table
+        accuracyTable.getColumns().clear();
+        accuracyTable.getItems().clear();
+        accuracyTable.refresh();
+        accuracyTable.getColumns().addAll(reportsTask.makeAccuracyTable());
+        accuracyTable.getItems().addAll(reportsTask.getAccuracyTable());
+
+        // Experimental Precision Table
+        precisionTable.getItems().clear();
+        precisionTable.getColumns().clear();
+        precisionTable.refresh();
+        if (!reportsTask.precisionTableEmpty()) {
+            precisionTable.getColumns().addAll(reportsTask.makePrecisionTable());
+            precisionTable.getItems().addAll(reportsTask.getPrecisionTable());
+        }
+
+        // Replicate Details Table
+        fileDetailsTable.getColumns().clear();
+        fileDetailsTable.getItems().clear();
+        fileDetailsTable.refresh();
+        fileDetailsTable.getColumns().addAll(reportsTask.makeReplicateDetailTable());
+        fileDetailsTable.getItems().addAll(reportsTask.getReplicateDetails());
+
+        // Create initial workbook object.
+        try {
+            createExcelWorkbook();
+        } catch (IOException e) {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+            showErrorMessage(getStackTraceString(e));
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Return cell fill color based on table type, column header and value.
+     *
+     * @param tableType Table type.
+     * @param header    Header of column
+     * @param value     Cell value
+     * @param rowIndex  Row index
+     * @return Foreground fill color of specified cell.
+     */
+    private XSSFColor getCellColor(String tableType, String header, String value, int rowIndex) {
+
+        String colorString;
+
+        if (tableType.equals("Result Summary")) {
+            colorString = reportsTask.getSampleColor(header, value, rowIndex);
+        } else {
+
+            if (value == null) {
+                colorString = ((rowIndex % 2) == 0) ? "FFFFFF" : "F6F6F6";
+            } else if (value.equals("NOT USED")) {
+                colorString = ((rowIndex % 2) == 0) ? "D9D9D9" : "BFBFBF";
+            } else if (header.contains("Accuracy")) {
+                double acc = Math.abs(100 - Double.parseDouble(value.split("%")[0]));
+                if (acc < accThreshold) {
+                    colorString = ((rowIndex % 2) == 0) ? "D9F2D0" : "B4E5A2";
+                } else if (acc > accThreshold & acc < accThreshold * 2) {
+                    colorString = ((rowIndex % 2) == 0) ? "FFF5C9" : "FFEB9C";
+                } else {
+                    colorString = ((rowIndex % 2) == 0) ? "FFD1D8" : "FFB6C1";
+                }
+            } else if (header.contains("RSD")) {
+                double acc = Double.parseDouble(value.split("%")[0]);
+                if (acc < 15.0) {
+                    colorString = ((rowIndex % 2) == 0) ? "D9F2D0" : "B4E5A2";
+                } else if (acc > 15.0 & acc < 15.0 * 2) {
+                    colorString = ((rowIndex % 2) == 0) ? "FFF5C9" : "FFEB9C";
+                } else {
+                    colorString = ((rowIndex % 2) == 0) ? "FFD1D8" : "FFB6C1";
+                }
+            } else {
+                colorString = ((rowIndex % 2) == 0) ? "FFFFFF" : "F6F6F6";
+            }
+        }
+
+        // Convert color string to hexcode
+        try {
+            return new XSSFColor(Hex.decodeHex(colorString), null);
+        } catch (DecoderException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Get user preference (database path) if they have used application before.
+     */
+    public void getPreferences() {
+
+        // This will retrieve the node where the user preferences are stored.
+        prefs = Preferences.userRoot().node(this.getClass().getName());
+
+        String databasePath = prefs.get("TargetedReports.Database", null);
+
+        if (databasePath != null) {
+            this.databasePath = Paths.get(databasePath);
+        }
+    }
+
+    /**
+     * Return stage to home page.
+     *
+     * @param event MouseEvent user clicked button
+     * @throws IOException Unable to load home page
+     */
+    public void homeButtonClick(ActionEvent event) throws IOException {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/cmsp/tool/box/HomePage.fxml"));
+        Parent root = fxmlLoader.load();
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
+
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/cmsp/tool/box/styleGuide.css")).toString());
+
+        stage.setScene(scene);
+        stage.show();
+    }
 
     /**
      * Initialize module.
@@ -74,33 +332,33 @@ public class TargetedReportsController {
         getPreferences();
 
         // Limit of Detection signal-to-noise spinner.
-        SpinnerValueFactory<Integer> valueFactoryBlank = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10);
+        SpinnerValueFactory<Integer> valueFactoryBlank = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10);
         valueFactoryBlank.setValue(3);
         blankThresholdSpinner.setValueFactory(valueFactoryBlank);
         blankThresholdSpinner.editorProperty().get().setAlignment(Pos.CENTER);
 
         // Limit of Detection signal-to-noise spinner.
-        SpinnerValueFactory<Integer> valueFactoryLOQ = new SpinnerValueFactory.IntegerSpinnerValueFactory(3,20);
+        SpinnerValueFactory<Integer> valueFactoryLOQ = new SpinnerValueFactory.IntegerSpinnerValueFactory(3, 20);
         valueFactoryLOQ.setValue(5);
         loqThresholdSpinner.setValueFactory(valueFactoryLOQ);
         loqThresholdSpinner.editorProperty().get().setAlignment(Pos.CENTER);
 
         // Limit of Quantitation minimum accuracy spinner.
-        SpinnerValueFactory<Integer> valueFactoryAccuracy = new SpinnerValueFactory.IntegerSpinnerValueFactory(5,30);
+        SpinnerValueFactory<Integer> valueFactoryAccuracy = new SpinnerValueFactory.IntegerSpinnerValueFactory(5, 30);
         valueFactoryAccuracy.setValue(20);
 
         // Insert percent sign in to spinner text field.
         valueFactoryAccuracy.setConverter(new StringConverter<>() {
 
             @Override
-            public String toString(Integer integer) {
-                return integer.toString() + "%";
-            }
-
-            @Override
             public Integer fromString(String s) {
                 String integer = s.replaceAll("%", "").trim();
                 return Integer.valueOf(integer);
+            }
+
+            @Override
+            public String toString(Integer integer) {
+                return integer.toString() + "%";
             }
         });
 
@@ -121,6 +379,21 @@ public class TargetedReportsController {
 
         fileDetailsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         fileDetailsTable.getSelectionModel().setCellSelectionEnabled(true);
+    }
+
+    /**
+     * Check if string is numeric
+     *
+     * @param str input string
+     * @return Boolean true if number string
+     */
+    private boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
@@ -148,31 +421,56 @@ public class TargetedReportsController {
 
             stage.showAndWait();
 
-            if(!Files.exists(controller.getDatabaseFolder())) {
+            if (!Files.exists(controller.getDatabaseFolder())) {
                 showErrorMessage(ErrorTypes.DATABASE);
             } else {
                 // Update database location and set application defaults.
                 this.databasePath = controller.getDatabaseFolder();
                 setPreferences();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             // TODO - better error handling.
             e.printStackTrace();
         }
     }
 
     /**
-     * Get user preference (database path) if they have used application before.
+     * Handles user selecting Skyline document to format.
+     * Submits path to export necessary files and format results tables.
+     *
+     * @param event
      */
-    public void getPreferences() {
+    public void openDocumentClick(ActionEvent event) {
 
-        // This will retrieve the node where the user preferences are stored.
-        prefs = Preferences.userRoot().node(this.getClass().getName());
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-        String databasePath = prefs.get("TargetedReports.Database", null);
+        // Initialize file chooser with Skyline extension.
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Skyline Document");
+        ExtensionFilter ex1 = new ExtensionFilter("Skyline Document", "*.sky");
+        fileChooser.getExtensionFilters().addAll(ex1);
 
-        if (databasePath != null) {
-            this.databasePath = Paths.get(databasePath);
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
+        if (selectedFile != null) {
+            this.skylineDocumentFile.setText(selectedFile.getName());
+            this.documentPath = Paths.get(selectedFile.getPath());
+        } else {
+            this.skylineDocumentFile.setText("");
+            this.documentPath = null;
+        }
+
+        // Submit Skyline document path for exports.
+        if (this.documentPath != null) {
+
+            if (this.databasePath == null || this.databasePath.toString().isEmpty()) {
+                showErrorMessage(ErrorTypes.DATABASE);
+                this.skylineDocumentFile.setText("");
+                this.documentPath = null;
+            } else {
+                // Start new thread for processing. Allows GUI to update during processing
+                Platform.runLater(this::generateResultTables);
+            }
         }
     }
 
@@ -190,7 +488,7 @@ public class TargetedReportsController {
      * Launches error window with input error message.
      */
     @FXML
-    protected  void showErrorMessage(ErrorTypes error) {
+    protected void showErrorMessage(ErrorTypes error) {
 
         try {
             // Get error page window design.
@@ -210,175 +508,49 @@ public class TargetedReportsController {
 
             stage.showAndWait();
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             // TODO - better error handling.
             e.printStackTrace();
         }
     }
 
     /**
-     * Return stage to home page.
-     *
-     * @param event MouseEvent user clicked button
-     * @throws IOException Unable to load home page
+     * Launches error window with input error message.
      */
-    public void homeButtonClick(ActionEvent event) throws IOException {
+    @FXML
+    protected void showErrorMessage(String string) {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/cmsp/tool/box/HomePage.fxml"));
-        Parent root = fxmlLoader.load();
-
-        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/cmsp/tool/box/styleGuide.css")).toString());
-
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    /**
-     * Handles user selecting Skyline document to format.
-     * Submits path to export necessary files and format results tables.
-     * @param event
-     */
-    public void openDocumentClick(ActionEvent event) {
-
-        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-
-        // Initialize file chooser with Skyline extension.
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Skyline Document");
-        ExtensionFilter ex1 = new ExtensionFilter("Skyline Document", "*.sky");
-        fileChooser.getExtensionFilters().addAll(ex1);
-
-        File selectedFile = fileChooser.showOpenDialog(stage);
-
-        if(selectedFile != null) {
-            this.skylineDocumentFile.setText(selectedFile.getName());
-            this.documentPath = Paths.get(selectedFile.getPath());
-        } else {
-            this.skylineDocumentFile.setText("");
-            this.documentPath = null;
-        }
-
-        // Submit Skyline document path for exports.
-        if(this.documentPath != null){
-
-            if (this.databasePath == null || this.databasePath.toString().isEmpty()) {
-                showErrorMessage(ErrorTypes.DATABASE);
-                this.skylineDocumentFile.setText("");
-                this.documentPath = null;
-            } else {
-                // Start new thread for processing. Allows GUI to update during processing
-                Platform.runLater(this::generateResultTables);
-            }
-        }
-    }
-
-    /**
-     * Submit selected Skyline document for report formatting.
-     * Export necessary reports and format them for visualization.
-     */
-    public void generateResultTables() {
-
-        this.lodThreshold = blankThresholdSpinner.getValue();
-        this.loqThreshold = loqThresholdSpinner.getValue();
-        this.accThreshold = accuracyThresholdSpinner.getValue();
-
-        // Submit user parameters to new task.
-        reportsTask = new TargetedReportsTask(databasePath, documentPath, lodThreshold,loqThreshold, accThreshold);
-
-        // Export results and format output for TableView
-        reportsTask.run();
-
-        // Check if everything is valid with task.
-        ErrorTypes error = reportsTask.validDocument();
-
-        if (error != null) {
-            showErrorMessage(error);
-            return;
-        }
-
-        // Generate tables for visualization and export.
-        reportsTask.generateReports();
-
-        // Calibration Fit Table
-        moleculeTable.getColumns().clear();
-        moleculeTable.getItems().clear();
-        moleculeTable.refresh();
-        moleculeTable.getColumns().addAll(reportsTask.makeMoleculeTable());
-        moleculeTable.getItems().addAll(reportsTask.getTargetedMoleculeEntry());
-
-        // Experimental Accuracy Table
-        accuracyTable.getColumns().clear();
-        accuracyTable.getItems().clear();
-        accuracyTable.refresh();
-        accuracyTable.getColumns().addAll(reportsTask.makeAccuracyTable());
-        accuracyTable.getItems().addAll(reportsTask.getAccuracyTable());
-
-        // Experimental Precision Table
-        precisionTable.getItems().clear();
-        precisionTable.getColumns().clear();
-        precisionTable.refresh();
-        if (!reportsTask.precisionTableEmpty()) {
-            precisionTable.getColumns().addAll(reportsTask.makePrecisionTable());
-            precisionTable.getItems().addAll(reportsTask.getPrecisionTable());
-        }
-
-        // Sample Outcomes Table
-        sampleTable.getColumns().clear();
-        sampleTable.getItems().clear();
-        sampleTable.refresh();
-        sampleTable.getColumns().addAll(reportsTask.makeSampleTable());
-        sampleTable.getItems().addAll(reportsTask.getSampleTable());
-
-        // Replicate Details Table
-        fileDetailsTable.getColumns().clear();
-        fileDetailsTable.getItems().clear();
-        fileDetailsTable.refresh();
-        fileDetailsTable.getColumns().addAll(reportsTask.makeReplicateDetailTable());
-        fileDetailsTable.getItems().addAll(reportsTask.getReplicateDetails());
-
-        // Create initial workbook object.
         try {
-            createExcelWorkbook();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            // Get error page window design.
+            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("ErrorPage.fxml"));
+            Parent root = fxmlLoader.load();
+
+            // Initialize error window with message.
+            ErrorPageController controller = fxmlLoader.getController();
+            controller.setErrorMessage(string);
+
+            // Launch pop-up window.
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setResizable(true);
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            // TODO - better error handling.
+            e.printStackTrace();
         }
-    }
-
-    /**
-     * Create excel workbook object for final report.
-     *
-     * @throws IOException
-     */
-    public void createExcelWorkbook() throws IOException {
-
-        workbook = new XSSFWorkbook();
-
-        Sheet sheetSummary = workbook.createSheet("Result Summary");
-        Sheet sheetFit = workbook.createSheet("Calibration Fit");
-        Sheet sheetAccuracy = workbook.createSheet("Experimental Accuracy");
-        Sheet sheetPrecision = workbook.createSheet("Experimental Precision");
-        Sheet sheetDetails = workbook.createSheet("Raw Data Details");
-        Sheet sheetLegend = workbook.createSheet("Color Legend");
-
-        writeXLSXTable(sheetSummary, sampleTable, "Result Summary");
-        writeXLSXTable(sheetFit, moleculeTable, "Calibration Fit");
-        writeXLSXTable(sheetAccuracy,  accuracyTable, "Experimental Accuracy");
-        writeXLSXTable(sheetPrecision, precisionTable, "Experimental Precision");
-        writeXLSXTable(sheetDetails, fileDetailsTable, "Raw Data Details");
-
-        writeXLSXTableLegend(sheetLegend);
     }
 
     /**
      * Write submitted table to Excel sheet.
      *
-     * @param sheet Specified sheet
+     * @param sheet     Specified sheet
      * @param tableView Results table
      * @param tableType Table type for color formatting
-     * @param <T> Ignore
+     * @param <T>       Ignore
      */
     private <T> void writeXLSXTable(Sheet sheet, TableView<T> tableView, String tableType) {
 
@@ -405,7 +577,7 @@ public class TargetedReportsController {
 
         // Create header row
         Row headerRow = sheet.createRow(0);
-        headerRow.setHeight((short)(25 * 20));
+        headerRow.setHeight((short) (25 * 20));
         for (int i = 0; i < tableView.getColumns().size(); i++) {
             TableColumn<T, ?> column = tableView.getColumns().get(i);
             Cell cell = headerRow.createCell(i);
@@ -461,63 +633,11 @@ public class TargetedReportsController {
         // Adjust column widths
         for (int i = 0; i < tableView.getColumns().size(); i++) {
             sheet.autoSizeColumn(i);
-            if(sheet.getColumnWidth(i) > 15000) {
+            if (sheet.getColumnWidth(i) > 15000) {
                 sheet.setColumnWidth(i, 15000);
             } else {
-                sheet.setColumnWidth(i ,sheet.getColumnWidth(i)+500);
+                sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 500);
             }
-        }
-    }
-
-    /**
-     * Return cell fill color based on table type, column header and value.
-     *
-     * @param tableType Table type.
-     * @param header Header of column
-     * @param value Cell value
-     * @param rowIndex Row index
-     * @return Foreground fill color of specified cell.
-     */
-    private XSSFColor getCellColor(String tableType, String header, String value, int rowIndex) {
-
-        String colorString;
-
-        if (tableType.equals("Result Summary")) {
-            colorString = reportsTask.getSampleColor(header, value, rowIndex);
-        } else {
-
-            if (value == null) {
-                colorString = ((rowIndex % 2) == 0) ? "FFFFFF" : "F6F6F6";
-            } else if (value.equals("NOT USED")) {
-                colorString = ((rowIndex % 2) == 0) ? "D9D9D9" : "BFBFBF";
-            } else if (header.contains("Accuracy")) {
-                double acc = Math.abs(100 - Double.parseDouble(value.split("%")[0]));
-                if (acc < accThreshold) {
-                    colorString = ((rowIndex % 2) == 0) ? "D9F2D0" : "B4E5A2";
-                } else if (acc > accThreshold & acc < accThreshold * 2) {
-                    colorString = ((rowIndex % 2) == 0) ? "FFF5C9" : "FFEB9C";
-                } else {
-                    colorString = ((rowIndex % 2) == 0) ? "FFD1D8" : "FFB6C1";
-                }
-            } else if (header.contains("RSD")){
-                double acc = Double.parseDouble(value.split("%")[0]);
-                if (acc < 15.0) {
-                    colorString = ((rowIndex % 2) == 0) ? "D9F2D0" : "B4E5A2";
-                } else if (acc > 15.0 & acc < 15.0 * 2) {
-                    colorString = ((rowIndex % 2) == 0) ? "FFF5C9" : "FFEB9C";
-                } else {
-                    colorString = ((rowIndex % 2) == 0) ? "FFD1D8" : "FFB6C1";
-                }
-            } else {
-                colorString = ((rowIndex % 2) == 0) ? "FFFFFF" : "F6F6F6";
-            }
-        }
-
-        // Convert color string to hexcode
-        try {
-            return new XSSFColor(Hex.decodeHex(colorString), null);
-        } catch (DecoderException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -610,7 +730,7 @@ public class TargetedReportsController {
 
         // Result Summary
         Row row0 = sheet.createRow(0);
-        row0.setHeight((short)(25 * 20));
+        row0.setHeight((short) (25 * 20));
         Cell cell00 = row0.createCell(0);
         cell00.setCellValue("Result Summary");
         cell00.setCellStyle(headerStyle);
@@ -618,7 +738,7 @@ public class TargetedReportsController {
         cell01.setCellStyle(headerStyle);
         Cell cell02 = row0.createCell(2);
         cell02.setCellStyle(headerStyle);
-        sheet.addMergedRegion(new CellRangeAddress(0,0,0,2));
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
 
         Row row1 = sheet.createRow(1);
         Cell cell10 = row1.createCell(0);
@@ -642,7 +762,7 @@ public class TargetedReportsController {
 
         // Experimental Accuracy and Precision
         Row row4 = sheet.createRow(4);
-        row4.setHeight((short)(25 * 20));
+        row4.setHeight((short) (25 * 20));
         Cell cell40 = row4.createCell(0);
         cell40.setCellValue("Experimental Accuracy / Precision");
         cell40.setCellStyle(headerStyle);
@@ -650,7 +770,7 @@ public class TargetedReportsController {
         cell41.setCellStyle(headerStyle);
         Cell cell42 = row4.createCell(2);
         cell42.setCellStyle(headerStyle);
-        sheet.addMergedRegion(new CellRangeAddress(4,4,0,2));
+        sheet.addMergedRegion(new CellRangeAddress(4, 4, 0, 2));
 
         Row row5 = sheet.createRow(5);
         Cell cell50 = row5.createCell(0);
@@ -688,57 +808,9 @@ public class TargetedReportsController {
         Cell cell82 = row8.createCell(2);
         cell82.setCellStyle(red2Style);
 
-        sheet.setColumnWidth(0 ,60*256);
-        sheet.setColumnWidth(1 ,10*256);
-        sheet.setColumnWidth(2 ,10*256);
-    }
-
-    /**
-     * Check if string is numeric
-     *
-     * @param str input string
-     * @return Boolean true if number string
-     */
-    private boolean isNumeric(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Export report workbook to local file.
-     *
-     * @param actionEvent Mouseclick. Not used.
-     */
-    public void exportButtonClick(ActionEvent actionEvent) {
-
-        Stage stage = new Stage();
-
-        File defaultDirectory = new File(documentPath.getParent().toString());
-        String defaultName = documentPath.getFileName().toString().split("\\.")[0] + "_report.xlsx";
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Report As...");
-        fileChooser.setInitialDirectory(defaultDirectory);
-        fileChooser.setInitialFileName(defaultName);
-
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Excel Workbook (*.xlsx)", "*.xlsx");
-        fileChooser.getExtensionFilters().add(extFilter);
-
-        File outputFile = fileChooser.showSaveDialog(stage);
-
-        // Write to file
-        try (FileOutputStream out = new FileOutputStream(outputFile)) {
-            workbook.write(out);
-            out.close();
-            workbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sheet.setColumnWidth(0, 60 * 256);
+        sheet.setColumnWidth(1, 10 * 256);
+        sheet.setColumnWidth(2, 10 * 256);
     }
 }
 

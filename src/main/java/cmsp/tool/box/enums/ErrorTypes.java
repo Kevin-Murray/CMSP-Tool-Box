@@ -6,7 +6,7 @@ package cmsp.tool.box.enums;
  */
 public enum ErrorTypes {
 
-    DATABASE("Database path not set properly.\nPlease set in - Files > Set Up...\n\nSelect `QuickQC` folder in CBS_cmsp_results_2024 back-up drive."),
+    DATABASE("Database path not set properly.\nPlease set in - Files > Set Up...\n\nSelect `QuickQA` folder in CBS_cmsp_results_2024 back-up drive."),
     RANGE("No QC entries in date range.\nPlease adjust the range and try again."),
     LOG("Log Number does not match expected format '00000'"),
     DATE( "Date not properly set."),
@@ -17,7 +17,8 @@ public enum ErrorTypes {
     MATRIX("Matrix not properly set."),
     TYPE("Event Type not properly set."),
 
-    TARGETBLANK("No replicates with `Blank` sample type detected in Skyline document. Please revise and resubmit.");
+    TARGETBLANK("No replicates with `Blank` sample type detected in Skyline document.\n\nPlease revise and resubmit."),
+    TARGETUNIQUE("Duplicate molecule names detected. Ensure all Skyline molecule names are unique, including internal standards.\n\nPlease revise and resubmit");
 
     private final String errorMessage;
 

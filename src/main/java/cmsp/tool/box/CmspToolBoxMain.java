@@ -19,7 +19,7 @@ public class CmspToolBoxMain extends Application {
     public void start(Stage stage) throws IOException {
 
         // Set application title.
-        stage.setTitle("CMSP Tool Box (v. 1.4.1)");
+        stage.setTitle("CMSP Tool Box (v. 1.5.0)");
 
         // Load main page design.
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
@@ -30,7 +30,7 @@ public class CmspToolBoxMain extends Application {
         main.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styleGuide.css")).toString());
 
         // Set application icon.
-        Image image = new Image("cmsp/tool/box/icons/quickQC-icon.png");
+        Image image = new Image("cmsp/tool/box/icons/application-icon.png");
         stage.getIcons().add(image);
 
         // Open gui.

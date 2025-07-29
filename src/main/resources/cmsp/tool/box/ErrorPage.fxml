@@ -5,10 +5,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.tool.box.gui.ErrorPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.tool.box.gui.ErrorPageController">
    <children>
-      <TextArea fx:id="errorMessageField" editable="false" layoutX="15.0" layoutY="14.0" mouseTransparent="true" prefHeight="109.0" prefWidth="270.0" wrapText="true" />
-      <Button fx:id="closeButton" layoutX="124.0" layoutY="144.0" mnemonicParsing="false" onAction="#closeButtonClicked" text="Close">
+      <TextArea fx:id="errorMessageField" editable="false" layoutX="11.0" layoutY="14.0" maxHeight="320.0" minHeight="320.0" wrapText="true" />
+      <Button fx:id="closeButton" layoutX="289.0" layoutY="349.0" mnemonicParsing="false" onAction="#closeButtonClicked" prefHeight="30.0" prefWidth="140.0" text="Close Window">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="copyButton" layoutX="68.0" layoutY="349.0" mnemonicParsing="false" onAction="#copyButtonClicked" prefHeight="30.0" prefWidth="140.0" text="Copy to Clipboard">
          <font>
             <Font size="14.0" />
          </font>

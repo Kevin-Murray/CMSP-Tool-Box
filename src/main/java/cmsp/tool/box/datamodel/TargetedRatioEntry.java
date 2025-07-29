@@ -56,7 +56,7 @@ public class TargetedRatioEntry {
                     break;
                 case QUANT:
                     // Quantification value is stored as "Value <Space> Unit". Parse by space and store value and units.
-                    measuredConcentration = (entry[i].equals("#N/A")) ? null : Double.parseDouble(entry[i].split(" ")[0]);
+                    measuredConcentration = (entry[i].equals("#N/A") || entry[i].contains("∞")) ? null : Double.parseDouble(entry[i].split(" ")[0]);
                     unit = (measuredConcentration == null) ? null : entry[i].split(" ", 2)[1];
                     break;
                 case ACCURACY:

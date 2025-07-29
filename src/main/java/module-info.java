@@ -6,6 +6,8 @@ module cmsp.tool.box {
     requires java.xml;
     requires org.apache.poi.ooxml;
     requires org.apache.commons.codec;
+    requires org.apache.logging.log4j;
+    requires java.desktop;
 
     opens cmsp.tool.box.gui to javafx.fxml;
     opens cmsp.tool.box.datamodel to javafx.fxml;
