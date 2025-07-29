@@ -106,7 +106,7 @@
                            </children></Pane>
                         <Pane layoutX="310.0" layoutY="10.0" prefHeight="200.0" prefWidth="300.0">
                            <children>
-                              <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="44.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
+                              <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="44.0" nodeOrientation="INHERIT" onMouseClicked="#launchModule_discoverReports" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
                                  <image>
                                     <Image url="@icons/homeIcon-reportDiscovery.png" />
                                  </image>
