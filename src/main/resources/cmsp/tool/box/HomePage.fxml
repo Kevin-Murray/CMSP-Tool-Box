@@ -120,16 +120,43 @@
                                  </padding>
                               </Label>
                            </children></Pane>
-                        <Pane layoutX="610.0" layoutY="10.0" prefHeight="200.0" prefWidth="300.0" />
+                        <Pane layoutX="610.0" layoutY="10.0" prefHeight="200.0" prefWidth="300.0">
+                           <children>
+                              <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="44.0" nodeOrientation="INHERIT" onMouseClicked="#launchModule_sequenceBuilder" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
+                                 <image>
+                                    <Image url="@icons/homeIcon-sequenceBuilder.png" />
+                                 </image>
+                              </ImageView>
+                              <Label alignment="BOTTOM_CENTER" layoutY="194.0" prefHeight="48.0" prefWidth="300.0" text="Sequence Builder" underline="true">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="10.0" />
+                                 </padding>
+                              </Label>
+                           </children></Pane>
                      </children>
                   </HBox>
                   <HBox layoutX="10.0" layoutY="10.0" prefHeight="242.0" prefWidth="1200.0">
                      <children>
-                        <AnchorPane prefHeight="200.0" prefWidth="300.0">
+                        <Pane prefHeight="200.0" prefWidth="300.0">
                            <children>
-                              <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="75.0" layoutY="46.0" nodeOrientation="INHERIT" onMouseClicked="#launchModule_targetedReports" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);">
+                                 <image>
+                                    <Image url="@icons/libraryBrowser_highRes.png" />
+                                 </image>
+                              </ImageView>
+                              <Label alignment="BOTTOM_CENTER" layoutY="195.0" prefHeight="48.0" prefWidth="300.0" text="Compound Library Viewer" underline="true">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="10.0" />
+                                 </padding>
+                              </Label>
                            </children>
-                        </AnchorPane>
+                        </Pane>
                      </children>
                   </HBox>
                   <HBox layoutX="10.0" layoutY="252.0" prefHeight="242.0" prefWidth="1200.0" />

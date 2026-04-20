@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.tool.box.gui.SequenceBuilderParametersController">
+   <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <AnchorPane prefHeight="548.0" prefWidth="900.0">
+         <children>
+            <TextField fx:id="piTextField" alignment="CENTER" layoutX="82.0" layoutY="14.0" prefHeight="26.0" prefWidth="99.0" />
+            <Label layoutX="20.0" layoutY="18.0" text="PI (x500):" />
+            <Label layoutX="207.0" layoutY="52.0" text="Instrument:" />
+            <ChoiceBox fx:id="instrumentChoiceBox" layoutX="272.0" layoutY="48.0" onAction="#actionInstrumentChoiceBox" prefHeight="26.0" prefWidth="135.0" />
+            <Label layoutX="20.0" layoutY="52.0" prefHeight="17.0" prefWidth="61.0" text="Exp. Type:" />
+            <ChoiceBox fx:id="expTypeChoiceBox" layoutX="83.0" layoutY="48.0" onAction="#actionExperimentTypeBox" prefHeight="25.0" prefWidth="99.0" />
+            <Separator layoutX="25.0" layoutY="82.0" prefHeight="5.0" prefWidth="550.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="97.0" layoutX="13.0" layoutY="96.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="97.0" layoutX="303.0" layoutY="96.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Label layoutX="19.0" layoutY="135.0" text="Total Num of:" />
+            <ChoiceBox fx:id="batchNumberChoice" layoutX="98.0" layoutY="130.0" prefHeight="26.0" prefWidth="98.0" />
+            <Spinner fx:id="batchNSpinner" layoutX="228.0" layoutY="130.0" prefHeight="26.0" prefWidth="62.0" />
+            <Label layoutX="19.0" layoutY="165.0" text="Distribute Batches:" />
+            <RadioButton fx:id="batchDistMaxRadio" layoutX="137.0" layoutY="165.0" mnemonicParsing="false" text="Maximally" />
+            <RadioButton fx:id="batchDistEqualRadio" layoutX="229.0" layoutY="165.0" mnemonicParsing="false" text="Equally" />
+            <Separator layoutX="27.0" layoutY="204.0" prefHeight="5.0" prefWidth="550.0" />
+            <Label layoutX="308.0" layoutY="134.0" text="Randomize Samples by:" />
+            <ChoiceBox fx:id="sampleRandomizeChoice" layoutX="445.0" layoutY="130.0" prefHeight="25.0" prefWidth="135.0" />
+            <Label layoutX="327.0" layoutY="165.0" text="Analyze Samples in:" />
+            <ChoiceBox fx:id="sampleAnalyzeChoice" layoutX="445.0" layoutY="161.0" prefHeight="25.0" prefWidth="135.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#fff3ee" height="97.0" layoutX="13.0" layoutY="216.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Label layoutX="424.0" layoutY="53.0" prefHeight="17.0" prefWidth="81.0" text="First Position:" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f5f4d5" height="97.0" layoutX="303.0" layoutY="216.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e6f8e7" height="97.0" layoutX="13.0" layoutY="320.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ebfff9" height="97.0" layoutX="303.0" layoutY="320.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#e5efff" height="97.0" layoutX="13.0" layoutY="426.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f1f8" height="97.0" layoutX="303.0" layoutY="426.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Separator layoutX="23.0" layoutY="534.0" prefHeight="5.0" prefWidth="550.0" />
+            <ChoiceBox fx:id="startPosition" layoutX="502.0" layoutY="49.0" onAction="#actionStartPositionBox" prefHeight="25.0" prefWidth="84.0" />
+            <Label layoutX="21.0" layoutY="256.0" text="Top Level:" />
+            <Spinner fx:id="calTopLevelSpinner" layoutX="80.0" layoutY="252.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label layoutX="153.0" layoutY="256.0" text="Bottom Level:" />
+            <Spinner fx:id="calBottomLevelSpinner" layoutX="228.0" layoutY="252.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label layoutX="22.0" layoutY="287.0" text="Analyze Calibrators:" />
+            <ChoiceBox fx:id="calAnalyzeChoice" layoutX="136.0" layoutY="283.0" prefHeight="25.0" prefWidth="154.0" />
+            <Label layoutX="309.0" layoutY="256.0" text="Library File Schema:" />
+            <ChoiceBox fx:id="libSchemaChoice" layoutX="422.0" layoutY="252.0" prefHeight="25.0" prefWidth="154.0" />
+            <Label layoutX="309.0" layoutY="287.0" text="Analyze Library Files:" />
+            <ChoiceBox fx:id="libAnalyzeChoice" layoutX="423.0" layoutY="283.0" prefHeight="25.0" prefWidth="154.0" />
+            <Label layoutX="21.0" layoutY="360.0" text="Num of QC Levels:" />
+            <Spinner fx:id="qcLevelsSpinner" layoutX="125.0" layoutY="356.0" prefHeight="25.0" prefWidth="61.0" />
+            <Button fx:id="qcLevelNamesButton" layoutX="200.0" layoutY="356.0" mnemonicParsing="false" text="Level Names" />
+            <Label layoutX="20.0" layoutY="390.0" text="Analyze:" />
+            <Spinner fx:id="qcNSpinner" layoutX="228.0" layoutY="387.0" prefHeight="25.0" prefWidth="61.0" />
+            <ChoiceBox fx:id="qcAnalyzeChoice" layoutX="69.0" layoutY="386.0" onAction="#actionSampleSpacingBox" prefHeight="25.0" prefWidth="127.0" />
+            <Label layoutX="208.0" layoutY="391.0" text="N=" />
+            <Label layoutX="313.0" layoutY="360.0" text="Num of SST Levels:" />
+            <Spinner fx:id="sstNumLevels" layoutX="420.0" layoutY="356.0" prefHeight="25.0" prefWidth="61.0" />
+            <Button fx:id="sstLevelNamesButton" layoutX="495.0" layoutY="356.0" mnemonicParsing="false" text="Level Names" />
+            <Label layoutX="311.0" layoutY="390.0" text="Analyze:" />
+            <Spinner fx:id="sstNSpinner" layoutX="519.0" layoutY="387.0" prefHeight="25.0" prefWidth="61.0" />
+            <ChoiceBox fx:id="sstAnalyze" layoutX="360.0" layoutY="386.0" onAction="#actionSampleSpacingBox" prefHeight="25.0" prefWidth="127.0" />
+            <Label layoutX="499.0" layoutY="391.0" text="N=" />
+            <Spinner fx:id="negBeforeCalSpinner" layoutX="21.0" layoutY="462.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label fx:id="negBCalLabel" layoutX="91.0" layoutY="466.0" text="Before Cal" />
+            <Spinner fx:id="negAfterCalSpinner" layoutX="169.0" layoutY="461.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label fx:id="negACalLabel" layoutX="238.0" layoutY="466.0" text="After Cal" />
+            <Spinner fx:id="negBeforeQcSpinner" layoutX="21.0" layoutY="492.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label layoutX="91.0" layoutY="496.0" text="Before QC" />
+            <Spinner fx:id="negAfterQcSpinner" layoutX="170.0" layoutY="492.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label layoutX="238.0" layoutY="496.0" text="After QC" />
+            <Spinner fx:id="blankBeforeCalSpinner" layoutX="314.0" layoutY="462.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label fx:id="blankBCalLabel" layoutX="384.0" layoutY="466.0" text="Before Cal" />
+            <Spinner fx:id="blankAfterCalSpinner" layoutX="462.0" layoutY="461.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label fx:id="blankACalLabel" layoutX="531.0" layoutY="466.0" text="After Cal" />
+            <Spinner fx:id="blankBeforeQcSpinner" layoutX="314.0" layoutY="492.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label layoutX="384.0" layoutY="496.0" text="Before QC" />
+            <Spinner fx:id="blankAfterQcSpinner" layoutX="463.0" layoutY="492.0" prefHeight="25.0" prefWidth="61.0" />
+            <Label layoutX="531.0" layoutY="496.0" text="After QC" />
+            <Label layoutX="207.0" layoutY="134.0" text="N=" />
+            <Rectangle fx:id="batchBox" arcHeight="5.0" arcWidth="5.0" fill="#f7f8fabf" height="97.0" layoutX="13.0" layoutY="96.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="sampleBox" arcHeight="5.0" arcWidth="5.0" fill="#f7f8fabf" height="97.0" layoutX="303.0" layoutY="96.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="calBox" arcHeight="5.0" arcWidth="5.0" fill="#fff4f0bf" height="97.0" layoutX="13.0" layoutY="216.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="libBox" arcHeight="5.0" arcWidth="5.0" fill="#f5f4d5bf" height="97.0" layoutX="303.0" layoutY="216.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="qcBox" arcHeight="5.0" arcWidth="5.0" fill="#e6f7e7bf" height="97.0" layoutX="13.0" layoutY="320.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="sstBox" arcHeight="5.0" arcWidth="5.0" fill="#edfffabf" height="97.0" layoutX="303.0" layoutY="320.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="negBox" arcHeight="5.0" arcWidth="5.0" fill="#e5f0ffbf" height="97.0" layoutX="14.0" layoutY="426.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle fx:id="solventBox" arcHeight="5.0" arcWidth="5.0" fill="#f7f2f7bf" height="97.0" layoutX="303.0" layoutY="426.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="284.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="13.0" layoutY="96.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <Label fx:id="batchLabel" disable="true" layoutX="30.0" layoutY="101.0" text="Batch Parameters" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="303.0" layoutY="96.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <Label fx:id="sampleLabel" disable="true" layoutX="317.0" layoutY="101.0" text="Sample Parameters" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="13.0" layoutY="216.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <CheckBox fx:id="calCheckBox" disable="true" layoutX="17.0" layoutY="220.0" mnemonicParsing="false" onAction="#actionCalCheckBox" text="Calibrators" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="303.0" layoutY="216.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <CheckBox fx:id="libCheckBox" disable="true" layoutX="307.0" layoutY="220.0" mnemonicParsing="false" onAction="#actionLibCheckBox" text="Library Files" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="13.0" layoutY="320.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <CheckBox fx:id="qcCheckBox" disable="true" layoutX="17.0" layoutY="324.0" mnemonicParsing="false" onAction="#actionQcCheckBox" text="Quality Control" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="303.0" layoutY="320.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <CheckBox fx:id="sstCheckBox" disable="true" layoutX="307.0" layoutY="324.0" mnemonicParsing="false" onAction="#actionSstCheckBox" text="System Suitability" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="13.0" layoutY="426.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <CheckBox fx:id="negCheckBox" disable="true" layoutX="17.0" layoutY="431.0" mnemonicParsing="false" onAction="#actionNegCheckBox" text="Negative Controls" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#f7f9fc" height="25.0" layoutX="303.0" layoutY="426.0" smooth="false" stroke="#d0d0d0" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeMiterLimit="50.0" strokeType="OUTSIDE" width="125.0" />
+            <CheckBox fx:id="blankCheckBox" disable="true" layoutX="307.0" layoutY="431.0" mnemonicParsing="false" onAction="#actionSolventCheckBox" text="Solvent Blanks" />
+            <Label layoutX="205.0" layoutY="18.0" text="Researcher (x500):" />
+            <TextField fx:id="researchTextField" alignment="CENTER" layoutX="310.0" layoutY="14.0" prefHeight="26.0" prefWidth="96.0" promptText="(Optional)" />
+            <Label layoutX="422.0" layoutY="18.0" text="Experiment #:" />
+            <TextField fx:id="expTextField" alignment="CENTER" layoutX="501.0" layoutY="14.0" prefHeight="26.0" prefWidth="85.0" />
+         </children>
+      </AnchorPane>
+      <ButtonBar prefHeight="34.0" prefWidth="580.0">
+        <buttons>
+            <Button fx:id="resetButton" minWidth="69.0" mnemonicParsing="false" prefHeight="25.0" text="Reset to Default" />
+          <Button fx:id="importButton" disable="true" mnemonicParsing="false" onAction="#actionImportButton" snapToPixel="false" text="Import Sample List" />
+        </buttons>
+         <padding>
+            <Insets right="15.0" />
+         </padding>
+      </ButtonBar>
+   </children>
+</VBox>

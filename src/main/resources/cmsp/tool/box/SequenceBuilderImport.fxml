@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cmsp.tool.box.gui.SequenceBuilderSampleController">
+   <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <AnchorPane prefHeight="548.0" prefWidth="900.0">
+         <children>
+            <Separator layoutX="23.0" layoutY="534.0" prefHeight="5.0" prefWidth="550.0" />
+            <TextArea fx:id="sampleTextArea" layoutX="23.0" layoutY="36.0" onKeyPressed="#actionSamplePaste" prefHeight="368.0" prefWidth="559.0" promptText="Paste entries (ctrl V)" />
+            <Label layoutX="23.0" layoutY="14.0" text="Samples to Randomize:" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#edf6ff" height="105.0" layoutX="23.0" layoutY="417.0" stroke="#a8a8a8" strokeType="INSIDE" width="559.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="31.0" layoutX="23.0" layoutY="417.0" stroke="#a8a8a8" strokeType="INSIDE" width="118.0" />
+            <Label layoutX="35.0" layoutY="424.0" text="Sample Summary" />
+            <Label layoutX="35.0" layoutY="461.0" text="File Prefix:" />
+            <TextField fx:id="prefixTextField" editable="false" layoutX="101.0" layoutY="459.0" prefHeight="25.0" prefWidth="242.0" />
+            <Label layoutX="358.0" layoutY="462.0" text="Total Number of Samples:" />
+            <TextField fx:id="sampleNumTextField" alignment="CENTER" editable="false" layoutX="505.0" layoutY="461.0" prefHeight="25.0" prefWidth="60.0" text="0" />
+            <Label layoutX="358.0" layoutY="493.0" text="Total Number of Groups:" />
+            <TextField fx:id="groupNumTextField" alignment="CENTER" editable="false" layoutX="505.0" layoutY="492.0" prefHeight="25.0" prefWidth="60.0" text="N/A" />
+            <Label layoutX="35.0" layoutY="493.0" text="Longest File Name:" />
+            <TextField fx:id="longFileTextField" alignment="CENTER" editable="false" layoutX="141.0" layoutY="491.0" prefHeight="25.0" prefWidth="46.0" text="0" />
+            <Label layoutX="205.0" layoutY="495.0" text="Max Characters:" />
+            <TextField fx:id="maxCharacterTextField" alignment="CENTER" editable="false" layoutX="296.0" layoutY="492.0" prefHeight="25.0" prefWidth="46.0" text="50" />
+            <Label layoutX="375.0" layoutY="14.0" text="*separate names and groups with tabs">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <ButtonBar prefHeight="34.0" prefWidth="580.0">
+        <buttons>
+            <Button fx:id="previousButton" minWidth="69.0" mnemonicParsing="false" prefHeight="25.0" text="Previous" />
+          <Button fx:id="importButton" mnemonicParsing="false" onAction="#actionCreateSequenceButton" snapToPixel="false" text="Create Sequence" />
+        </buttons>
+         <padding>
+            <Insets right="15.0" />
+         </padding>
+      </ButtonBar>
+   </children>
+</VBox>

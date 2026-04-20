@@ -73,4 +73,22 @@ public class HomePageController {
         stage.setScene(scene);
         stage.show();
     }
+
+    /**
+     * Change stage to Sequence Builder Module
+     *
+     * @param event MouseEvent mouse click
+     * @throws IOException
+     */
+    public void launchModule_sequenceBuilder(MouseEvent event) throws IOException {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/cmsp/tool/box/SequenceBuilderPage.fxml"));
+        root = fxmlLoader.load();
+
+        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/cmsp/tool/box/styleGuide.css")).toString());
+        stage.setScene(scene);
+        stage.show();
+    }
 }

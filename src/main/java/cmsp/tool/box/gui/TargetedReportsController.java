@@ -338,7 +338,7 @@ public class TargetedReportsController {
         blankThresholdSpinner.editorProperty().get().setAlignment(Pos.CENTER);
 
         // Limit of Detection signal-to-noise spinner.
-        SpinnerValueFactory<Integer> valueFactoryLOQ = new SpinnerValueFactory.IntegerSpinnerValueFactory(3, 20);
+        SpinnerValueFactory<Integer> valueFactoryLOQ = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20);
         valueFactoryLOQ.setValue(5);
         loqThresholdSpinner.setValueFactory(valueFactoryLOQ);
         loqThresholdSpinner.editorProperty().get().setAlignment(Pos.CENTER);

@@ -86,4 +86,24 @@ public class MathUtils {
 
         return (Math.log(N) / Math.log(2));
     }
+
+    /**
+     * Test if string is integer
+     *
+     * @param str String input
+     * @return Boolean true if string is integer.
+     */
+    public static boolean isInteger(String str) {
+
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
